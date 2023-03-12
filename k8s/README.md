@@ -1,13 +1,13 @@
 # Setup cluster-autoscaler for EKS cluster
 
 Refference links
-	• Tagg your Amazon EC2 resources https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Tags.html
+• Tagg your Amazon EC2 resources https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Tags.html
 	 
-	• Create an IAM OIDC provider https://docs.aws.amazon.com/eks/latest/userguide/enable-iam-roles-for-service-accounts.html
+• Create an IAM OIDC provider https://docs.aws.amazon.com/eks/latest/userguide/enable-iam-roles-for-service-accounts.html
 	 
-	• Install eksctl https://docs.aws.amazon.com/eks/latest/userguide/eksctl.html
+• Install eksctl https://docs.aws.amazon.com/eks/latest/userguide/eksctl.html
 	 
-	• Create an Amazon EKS Cluster https://docs.aws.amazon.com/eks/latest/userguide/create-cluster.html
+• Create an Amazon EKS Cluster https://docs.aws.amazon.com/eks/latest/userguide/create-cluster.html
 
 
 ## Prerequisits:
@@ -20,7 +20,7 @@ Refference links
 	  The Cluster Autoscaler requires the following tags on your Auto Scaling groups so that they can be auto-discovered. 
 	  Check your tags, if they are not there just add manually. 
 	  If you used eksctl to create your node groups, these tags are automatically applied.
-		Key	Value
+		Key	                                       Value
 		
 		k8s.io/cluster-autoscaler/my-cluster-name	owned
 		k8s.io/cluster-autoscaler/enabled	    	true
@@ -66,7 +66,7 @@ Refference links
      
 
 
-### Create an IAM role and attach an IAM policy to it using eksctl
+### Create an IAM role and attach an IAM policy to it
 
 ```json
 {
@@ -96,7 +96,8 @@ Refference links
 1. Create the Cluster Autoscaler YAML file cluster-autoscaler.yaml 
     
     You can also use github repository and make some adjustments based on your cluster.
-    curl -O https://raw.githubusercontent.com/kubernetes/autoscaler/master/cluster-autoscaler/cloudprovider/aws/examples/cluster-autoscaler-autodiscover.yaml
+    
+   ``` curl -O https://raw.githubusercontent.com/kubernetes/autoscaler/master/cluster-autoscaler/cloudprovider/aws/examples/cluster-autoscaler-autodiscover.yaml```
 
 2. Apply the YAML file to your cluster.
     kubectl apply -f cluster-autoscaler.yaml
@@ -109,18 +110,19 @@ Refference links
      -p '{"spec":{"template":{"metadata":{"annotations":{"cluster-autoscaler.kubernetes.io/safe-to-evict": "false"}}}}}'
 
 5. Edit the Cluster Autoscaler yaml file so it must have the following lines:
-      spec:
-      containers:
-      - command
-        - ./cluster-autoscaler
-        - --v=4
-        - --stderrthreshold=info
-        - --cloud-provider=aws
-        - --skip-nodes-with-local-storage=false
-        - --expander=least-waste
-        - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster-autoscaler/cluster
-        - --balance-similar-node-groups
-        - --skip-nodes-with-system-pods=false
+```
+          command: 
+            - ./cluster-autoscaler
+            - --v=4
+            - --stderrthreshold=info
+            - --cloud-provider=aws
+            - --skip-nodes-with-local-storage=false
+            - --expander=least-waste
+            - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster-autoscaler/ubuntu-eks-dev # Update cluster with your cluster name
+            - --balance-similar-node-groups
+            - --skip-nodes-with-system-pods=false
+```
+     
 
 6. Set the Cluster Autoscaler image to the latest available by checking the oficial repo in GitHub
 
